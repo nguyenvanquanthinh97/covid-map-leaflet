@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PatientInfo from "./PatientInfo";
 import { Row, Col } from 'react-bootstrap';
+import moment from 'moment';
 
 import './style.scss';
 import CovidMap from "./CovidMap";
@@ -14,7 +15,10 @@ const CovidDashboard = (props) => {
             .then(res => res.json())
             .then(
                 (result) => {
-                    setPatients(result.data);
+                    const patients = result.data;
+                    const sortedPatients = patients.sort((p1, p2) => new moment(p2.verifyDate) - new moment(p1.verifyDate));
+
+                    setPatients(sortedPatients);
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
@@ -31,7 +35,7 @@ const CovidDashboard = (props) => {
     return (
         <div>
             <Row>
-                <Col xs={9}><CovidMap onPatientMarkerClicked={patientMarkerClickedHandler} patients={patients} selectedPatient={currentPatient}/></Col>
+                <Col xs={9}><CovidMap onPatientMarkerClicked={patientMarkerClickedHandler} patients={patients} selectedPatient={currentPatient} /></Col>
                 <Col xs={3}>
                     {currentPatient &&
                         <PatientInfo name={currentPatient.name} address={currentPatient.address} note={currentPatient.note}
