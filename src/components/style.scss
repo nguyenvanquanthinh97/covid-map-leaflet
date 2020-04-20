@@ -1,0 +1,17 @@
+.list-patient {
+  max-height: calc(100vh - 450px);
+  overflow: auto;
+  border: 2px solid #ccc;
+  width: 90%;
+  margin: 25px auto;
+  .list-patient__item {
+    cursor: pointer;
+    &:hover {
+      color: #6387bf
+    }
+  }
+  .list-patient__item--selected {
+    color: #631ca6;
+    font-weight: bold;
+  }
+}
