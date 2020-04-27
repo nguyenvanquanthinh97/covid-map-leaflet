@@ -1,9 +1,7 @@
 import React from 'react';
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
 
-import { is2FloatsEqual } from '../utils';
-
-const CovidMap = ({ onPatientMarkerClicked, patients, selectedPatient }) => {
+const CovidMap = ({ onPatientMarkerClicked, patients, selectedPatientIdx }) => {
 
     const openPopup = (marker) => {
         if (marker && marker.leafletElement) {
@@ -12,18 +10,18 @@ const CovidMap = ({ onPatientMarkerClicked, patients, selectedPatient }) => {
     };
 
     return (
-        <Map center={selectedPatient ? [selectedPatient.lat, selectedPatient.lng] : [10.762887, 106.6800684]} zoom={13}>
+        <Map center={selectedPatientIdx ? [patients[selectedPatientIdx].lat, patients[selectedPatientIdx].lng] : [10.762887, 106.6800684]} zoom={13}>
             <TileLayer
                 attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.osm.org/{z}/{x}/{y}.png   "
             />
             {patients && patients.map((patient, idx) => {
                 let isSelected = false;
-                if (selectedPatient && is2FloatsEqual(selectedPatient.lat, patient.lat) && is2FloatsEqual(selectedPatient.lng, patient.lng)) {
+                if (selectedPatientIdx === idx) {
                     isSelected = true;
                 }
                 return (
-                    <Marker ref={isSelected ? openPopup : null} key={`${patient.name}-${idx}`} position={[patient.lat, patient.lng]} onClick={() => { onPatientMarkerClicked(patient); }}>
+                    <Marker ref={isSelected ? openPopup : null} key={`${patient.name}-${idx}`} position={[patient.lat, patient.lng]} onClick={() => { onPatientMarkerClicked(idx); }}>
                         <Popup>
                             <ul>
                                 <li>Name: {patient.name}</li>

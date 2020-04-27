@@ -1,17 +1,59 @@
-.list-patient {
-  max-height: calc(100vh - 450px);
-  overflow: auto;
-  border: 2px solid #ccc;
-  width: 90%;
-  margin: 25px auto;
-  .list-patient__item {
-    cursor: pointer;
-    &:hover {
-      color: #6387bf
+$patient-info-height: 30%;
+$list-patient-height: 50%;
+$main-content-height: 80%;
+
+.main-content {
+  width: 100%;
+  height: $main-content-height;
+  padding: 10px;
+  .patient-info {
+    border: 1px solid #ccc;
+    height: $patient-info-height;
+    overflow: auto;
+    li {
+      line-height: 1.5rem;
     }
   }
-  .list-patient__item--selected {
-    color: #631ca6;
-    font-weight: bold;
+  .list-patient {
+    max-height: $list-patient-height;
+    overflow: auto;
+    border: 2px solid #ccc;
+    width: 100%;
+    margin: 25px auto;
+    .list-patient__item {
+      cursor: pointer;
+      &:hover {
+        color: #6387bf
+      }
+    }
+    .list-patient__item--selected {
+      color: #631ca6;
+      font-weight: bold;
+    }
   }
 }
+
+.container__seek-bar {
+  width: 100%;
+  padding: 0 20px;
+  .button-control{
+    width: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    .button {
+      width: 50%;
+      height: auto;
+    }
+  }
+  .seek-bar {
+    width: 90%;
+  }
+}
+
+.leaflet-container {
+  height: 90%;
+  width: 100%;
+}
+

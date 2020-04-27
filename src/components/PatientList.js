@@ -1,23 +1,21 @@
 import React, { useRef, useEffect } from 'react';
 import { ListGroup } from 'react-bootstrap';
 
-import { is2FloatsEqual } from '../utils';
-
-const PatientList = ({ patients, onPatientMarkerClicked, selectedPatient }) => {
+const PatientList = ({ patients, onPatientMarkerClicked, selectedPatientIdx }) => {
   const selectedPatientRef = useRef(null);
 
   useEffect(() => {
-    if (selectedPatient) {
+    if (selectedPatientIdx) {
       selectedPatientRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [selectedPatient]);
+  }, [selectedPatientIdx]);
 
   return (
-    <ListGroup>
+    <ListGroup style={{width: "100%"}}>
       {patients.map((patient, index) => {
         let classNames = "list-patient__item";
         let isSelected = false;
-        if (selectedPatient && is2FloatsEqual(selectedPatient.lat, patient.lat) && is2FloatsEqual(selectedPatient.lng, patient.lng)) {
+        if (selectedPatientIdx === index) {
           classNames += " list-patient__item--selected";
           isSelected = true;
         }
@@ -25,7 +23,7 @@ const PatientList = ({ patients, onPatientMarkerClicked, selectedPatient }) => {
           <ListGroup.Item
             className={classNames}
             key={`${patient.name}-${index}`}
-            onClick={() => { onPatientMarkerClicked(patient); }}
+            onClick={() => { onPatientMarkerClicked(index); }}
             ref={isSelected ? selectedPatientRef : null}
           >
             {patient.name}

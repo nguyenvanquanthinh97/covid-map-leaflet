@@ -1,17 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState, useReducer } from 'react';
 import PatientInfo from "./PatientInfo";
 import { Row, Col } from 'react-bootstrap';
+import { FaPlay, FaStop } from 'react-icons/fa';
 import moment from 'moment';
 
 import './style.scss';
 import CovidMap from "./CovidMap";
 import PatientList from './PatientList';
+import DateSlider from './DateSlider';
 
 const CovidDashboard = (props) => {
-    const [currentPatient, setCurrentPatient] = useState(null);
+    const [currentPatientIdx, setCurrentPatientIdx] = useState(null);
     const [patients, setPatients] = useState([]);
+    const [days, setDays] = useState(0);
+    const [isStop, setIsStop] = useState(true);
+
+    const currentPatients = [];
+    const dateStart = '08-12-2019';
+    const dateNow = moment(Date.now());
+    const diffFromNow = dateNow.diff(moment(dateStart, 'DD-MM-YYYY'), 'days');
+
     useEffect(() => {
-        fetch("https://maps.vnpost.vn/apps/covid19/api/patientapi/list")
+        fetch("https://cors-anywhere.herokuapp.com/https://maps.vnpost.vn/apps/covid19/api/patientapi/list")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -29,25 +39,73 @@ const CovidDashboard = (props) => {
                 }
             );
     }, []);
-    const patientMarkerClickedHandler = (patient) => {
-        setCurrentPatient(patient);
+
+    useEffect(() => {
+        let idInterval = null;
+        if (!isStop) {
+            idInterval = setInterval(() => {
+                setDays(days => {
+                    if (days > diffFromNow) {
+                        return 0;
+                    }
+                    return days + 1;
+                });
+            }, 2000);
+        }
+
+        if (isStop) {
+            clearInterval(idInterval);
+        }
+        return () => clearInterval(idInterval);
+    }, [isStop]);
+
+    const handlePatientsDateSelected = (days) => {
+        const selectedPatients = patients.filter(patient => {
+            const verifyDate = moment(patient.verifyDate);
+            return verifyDate.isSameOrBefore(moment(dateStart, 'DD-MM-YYYY').add(days, 'days'));
+        });
+        return selectedPatients;
     };
+
+    const patientMarkerClickedHandler = (patientIdx) => {
+        setCurrentPatientIdx(patientIdx);
+    };
+
+    const dateSliderChangeHandler = (event) => {
+        const days = event.target.value;
+        setDays(Number(days));
+    };
+
+    const buttonControlClickHandler = () => {
+        setIsStop(!isStop);
+    };
+
+    currentPatients.push(...handlePatientsDateSelected(days));
+
     return (
-        <div>
-            <Row>
-                <Col xs={9}><CovidMap onPatientMarkerClicked={patientMarkerClickedHandler} patients={patients} selectedPatient={currentPatient} /></Col>
-                <Col xs={3}>
-                    {currentPatient &&
-                        <PatientInfo name={currentPatient.name} address={currentPatient.address} note={currentPatient.note}
-                            verifyDate={currentPatient.verifyDate} />}
+        <Fragment>
+            <Row className="main-content">
+                <Col xs={9} style={{ height: "100%" }}><CovidMap onPatientMarkerClicked={patientMarkerClickedHandler} patients={currentPatients} selectedPatientIdx={currentPatientIdx} /></Col>
+                <Col xs={3} style={{ height: "100%" }}>
+                    <Row className="patient-info">
+                        {(currentPatientIdx !== null) &&
+                            <PatientInfo name={patients[currentPatientIdx].name} address={currentPatients[currentPatientIdx].address} note={currentPatients[currentPatientIdx].note}
+                                verifyDate={currentPatients[currentPatientIdx].verifyDate} />}
+                    </Row>
+                    <Row className='list-patient'>
+                        <PatientList onPatientMarkerClicked={patientMarkerClickedHandler} patients={currentPatients} selectedPatientIdx={currentPatientIdx} />
+                    </Row>
                 </Col>
             </Row>
-            <Row>
-                <div className='list-patient'>
-                    <PatientList onPatientMarkerClicked={patientMarkerClickedHandler} patients={patients} selectedPatient={currentPatient} />
+            <Row className="container__seek-bar">
+                <div className="button-control" onClick={buttonControlClickHandler}>
+                    {isStop ? <FaPlay className="button" /> : <FaStop className="button" />}
+                </div>
+                <div className="seek-bar">
+                    <DateSlider dateStart={dateStart} minDays={0} maxDays={diffFromNow} valueDays={days} onDateSliderChange={dateSliderChangeHandler} />
                 </div>
             </Row>
-        </div>);
+        </Fragment>);
 };
 
 export default CovidDashboard;
