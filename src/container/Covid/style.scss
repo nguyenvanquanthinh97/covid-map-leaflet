@@ -39,6 +39,7 @@
 .container__seek-bar {
   width: 100%;
   padding: 0 20px;
+  height: 10%;
   .button-control{
     width: 5%;
     display: flex;
@@ -52,5 +53,10 @@
   }
   .seek-bar {
     width: 90%;
+    height: 100%;
+    .form-group {
+      margin-bottom: 0;
+      height: 100%;
+    }
   }
 }

@@ -28,7 +28,6 @@ const StatsDashboard = () => {
         const [vietnameData, worldData] = await Promise.all([promiseVietnamFetch, promiseWorldFetch]);
 
         const transformVietnamData = transformStatistics(vietnameData);
-
         const transformWorldData = transformStatistics(worldData);
 
         setStatistics({

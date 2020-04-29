@@ -13,5 +13,7 @@ export const lineChart = {
 }
 
 export const variables = {
-  waiting: 'Đang tải dữ liệu, xin chờ'
+  waiting: 'Đang tải dữ liệu, xin chờ',
+  vietnamMap: 'Bản đồ VN',
+  statisticsMap: 'Đồ thị ca số mắc COVID'
 }
