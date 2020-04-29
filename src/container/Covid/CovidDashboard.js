@@ -3,17 +3,24 @@ import PatientInfo from "../../components/PatientInfo";
 import { Row, Col } from 'react-bootstrap';
 import { FaPlay, FaStop } from 'react-icons/fa';
 import moment from 'moment';
+import { get } from 'lodash';
 
 import './style.scss';
 import CovidMap from "../../components/CovidMap";
 import PatientList from '../../components/PatientList';
 import DateSlider from '../../components/DateSlider';
+import Spinner from '../../components/Spinner';
+import {variables} from '../../utils/variants';
 
 const CovidDashboard = (props) => {
     const [currentPatientIdx, setCurrentPatientIdx] = useState(null);
-    const [patients, setPatients] = useState([]);
+    const [patients, setPatients] = useState({
+        isLoading: true,
+        data: []
+    });
     const [days, setDays] = useState(0);
     const [isStop, setIsStop] = useState(true);
+    const [error, setError] = useState(null);
 
     const currentPatients = [];
     const dateStart = '08-12-2019';
@@ -21,23 +28,22 @@ const CovidDashboard = (props) => {
     const diffFromNow = dateNow.diff(moment(dateStart, 'DD-MM-YYYY'), 'days');
 
     useEffect(() => {
-        fetch("https://maps.vnpost.vn/apps/covid19/api/patientapi/list")
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    const patients = result.data;
-                    const sortedPatients = patients.sort((p1, p2) => new moment(p2.verifyDate) - new moment(p1.verifyDate));
+        const fetchData = async () => {
+            try {
+                const result = await fetch("https://cors-anywhere.herokuapp.com/https://maps.vnpost.vn/apps/covid19/api/patientapi/list").then(res => res.json());
 
-                    setPatients(sortedPatients);
-                },
-                // Note: it's important to handle errors here
-                // instead of a catch() block so that we don't swallow
-                // exceptions from actual bugs in components.
-                (error) => {
-                    // setIsLoaded(true);
-                    // setError(error);
-                }
-            );
+                const patients = result.data;
+                const sortedPatients = patients.sort((p1, p2) => new moment(p2.verifyDate) - new moment(p1.verifyDate));
+
+                setPatients({
+                    isLoading: false,
+                    data: sortedPatients
+                });
+            } catch (error) {
+                setError(error);
+            }
+        };
+        fetchData();
     }, []);
 
     useEffect(() => {
@@ -60,11 +66,12 @@ const CovidDashboard = (props) => {
     }, [isStop, diffFromNow]);
 
     const handlePatientsDateSelected = (days) => {
-        const firstSelectedPatientIndex = patients.findIndex(patient => {
+        const patientsData = get(patients, 'data', []);
+        const firstSelectedPatientIndex = patientsData.findIndex(patient => {
             const verifyDate = moment(patient.verifyDate);
             return verifyDate.isSameOrBefore(moment(dateStart, 'DD-MM-YYYY').add(days, 'days'));
         });
-        return patients.slice(firstSelectedPatientIndex);
+        return patientsData.slice(firstSelectedPatientIndex);
     };
 
     const patientMarkerClickedHandler = (patientIdx) => {
@@ -84,27 +91,32 @@ const CovidDashboard = (props) => {
 
     return (
         <Fragment>
-            <Row className="container__map-info-list">
-                <Col xs={9} style={{ height: "100%" }}><CovidMap onPatientMarkerClicked={patientMarkerClickedHandler} patients={currentPatients} selectedPatientIdx={currentPatientIdx} /></Col>
-                <Col xs={3} style={{ height: "100%" }}>
-                    <Row className="patient-info">
-                        {(currentPatientIdx !== null) &&
-                            <PatientInfo name={patients[currentPatientIdx].name} address={currentPatients[currentPatientIdx].address} note={currentPatients[currentPatientIdx].note}
-                                verifyDate={currentPatients[currentPatientIdx].verifyDate} />}
+            {error && <div>{error}</div>}
+            {(!error && patients.isLoading) &&  <div style={{textAlign: 'center'}}><Spinner /> {variables.waiting} </div>}
+            {(!patients.isLoading && !error) &&
+                (<Fragment>
+                    <Row className="container__map-info-list">
+                        <Col xs={9} style={{ height: "100%" }}><CovidMap onPatientMarkerClicked={patientMarkerClickedHandler} patients={currentPatients} selectedPatientIdx={currentPatientIdx} /></Col>
+                        <Col xs={3} style={{ height: "100%" }}>
+                            <Row className="patient-info">
+                                {(currentPatientIdx !== null) &&
+                                    <PatientInfo name={currentPatients[currentPatientIdx].name} address={currentPatients[currentPatientIdx].address} note={currentPatients[currentPatientIdx].note}
+                                        verifyDate={currentPatients[currentPatientIdx].verifyDate} />}
+                            </Row>
+                            <Row className='list-patient'>
+                                <PatientList onPatientMarkerClicked={patientMarkerClickedHandler} patients={currentPatients} selectedPatientIdx={currentPatientIdx} />
+                            </Row>
+                        </Col>
                     </Row>
-                    <Row className='list-patient'>
-                        <PatientList onPatientMarkerClicked={patientMarkerClickedHandler} patients={currentPatients} selectedPatientIdx={currentPatientIdx} />
+                    <Row className="container__seek-bar">
+                        <div className="button-control" onClick={buttonControlClickHandler}>
+                            {isStop ? <FaPlay className="button" /> : <FaStop className="button" />}
+                        </div>
+                        <div className="seek-bar">
+                            <DateSlider dateStart={dateStart} minDays={0} maxDays={diffFromNow} valueDays={days} onDateSliderChange={dateSliderChangeHandler} />
+                        </div>
                     </Row>
-                </Col>
-            </Row>
-            <Row className="container__seek-bar">
-                <div className="button-control" onClick={buttonControlClickHandler}>
-                    {isStop ? <FaPlay className="button" /> : <FaStop className="button" />}
-                </div>
-                <div className="seek-bar">
-                    <DateSlider dateStart={dateStart} minDays={0} maxDays={diffFromNow} valueDays={days} onDateSliderChange={dateSliderChangeHandler} />
-                </div>
-            </Row>
+                </Fragment>)}
         </Fragment>);
 };
 

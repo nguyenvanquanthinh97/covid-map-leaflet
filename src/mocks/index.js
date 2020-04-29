@@ -2205,7 +2205,7 @@ fetchMock.get('https://maps.vnpost.vn/apps/covid19/api/patientapi/list', {
         "verifyDate": "2020-04-08T00:00:00"
     }],
     "length": 0
-});
+}, {delay: 2000});
 
 fetchMock.get('https://td.fpt.ai/corona/corona-chart-vn.json', {
     "Ngày 30/1": [

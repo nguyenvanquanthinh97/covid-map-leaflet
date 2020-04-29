@@ -11,3 +11,7 @@ export const lineChart = {
   recoveringPatiens: 'Đang điều trị',
   totalPatients: 'Tổng số ca nhiễm'
 }
+
+export const variables = {
+  waiting: 'Đang tải dữ liệu, xin chờ'
+}

@@ -24,8 +24,6 @@ const Dashboard = ({ match }) => {
         </Row>
       </div>
       <div className="main-content">
-        {/* <CovidDashboard /> */}
-        {/* <StatsDashboard /> */}
         {path === '/map' ? <CovidDashboard /> : <StatsDashboard />}
       </div>
     </Container>

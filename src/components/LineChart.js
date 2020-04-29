@@ -2,7 +2,6 @@ import React from 'react';
 
 import CanvasJSReact from '../assets/chart/canvasjs.react';
 
-const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const LineChart = ({ data, title, subtitle, axisXTitle, axisYTitle }) => {
