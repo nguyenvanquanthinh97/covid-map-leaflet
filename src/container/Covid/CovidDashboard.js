@@ -39,8 +39,8 @@ const CovidDashboard = (props) => {
                     isLoading: false,
                     data: sortedPatients
                 });
-            } catch (error) {
-                setError(error);
+            } catch (err) {
+                setError(get(err, 'TypeError', 'Fail To Fetch'));
             }
         };
         fetchData();
@@ -91,7 +91,7 @@ const CovidDashboard = (props) => {
 
     return (
         <Fragment>
-            {error && <div>{error}</div>}
+            {error && <div style={{textAlign: 'center'}}>{error}</div>}
             {(!error && patients.isLoading) &&  <div style={{textAlign: 'center'}}><Spinner /> {variables.waiting} </div>}
             {(!patients.isLoading && !error) &&
                 (<Fragment>

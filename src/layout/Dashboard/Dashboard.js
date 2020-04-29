@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Container } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
 import NavCustom from '../../components/NavCustom';
 import CovidDashboard from '../../container/Covid';
@@ -12,7 +12,7 @@ const Dashboard = ({ match }) => {
   const { path } = match;
 
   return (
-    <Container>
+    <div className="container-fluid">
       <div className="navigation-items">
         <Row style={{ height: "100%" }}>
           <Col col={6} style={{ height: "100%" }}>
@@ -26,7 +26,7 @@ const Dashboard = ({ match }) => {
       <div className="main-content">
         {path === '/map' ? <CovidDashboard /> : <StatsDashboard />}
       </div>
-    </Container>
+    </div>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
+import { get } from 'lodash';
 
 import { lineChart, variables } from '../../utils/variants';
 import { transformStatistics, transformStatisticsToLineChartData } from '../../utils';
@@ -35,8 +36,8 @@ const StatsDashboard = () => {
           vietnam: transformStatisticsToLineChartData(transformVietnamData, lineNames, 'spline'),
           world: transformStatisticsToLineChartData(transformWorldData, lineNames, 'spline')
         });
-      } catch (error) {
-        setError(error);
+      } catch (err) {
+        setError(get(err, 'TypeError', 'Fail To Fetch'));
       }
 
     };
@@ -45,8 +46,8 @@ const StatsDashboard = () => {
 
   return (
     <div className="container-stats">
-      {error && <div>{error}</div>}
-      {(!error && statistics.isLoading) && <div><Spinner /> {variables.waiting} </div>}
+      {error && <div style={{ textAlign: 'center' }}>{error}</div>}
+      {(!error && statistics.isLoading) && <div style={{ textAlign: 'center' }}><Spinner /> {variables.waiting} </div>}
       {(!statistics.isLoading && !error) &&
         <Row style={{ height: "100%" }}>
           <Col xs={6}>
