@@ -11,7 +11,7 @@ const PatientList = ({ patients, onPatientMarkerClicked, selectedPatientIdx }) =
   }, [selectedPatientIdx]);
 
   return (
-    <ListGroup style={{width: "100%"}}>
+    <ListGroup style={{ width: "100%" }}>
       {patients.map((patient, index) => {
         let classNames = "list-patient__item";
         let isSelected = false;

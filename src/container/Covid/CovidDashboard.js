@@ -1,13 +1,13 @@
-import React, { Fragment, useEffect, useState, useReducer } from 'react';
-import PatientInfo from "./PatientInfo";
+import React, { Fragment, useEffect, useState } from 'react';
+import PatientInfo from "../../components/PatientInfo";
 import { Row, Col } from 'react-bootstrap';
 import { FaPlay, FaStop } from 'react-icons/fa';
 import moment from 'moment';
 
 import './style.scss';
-import CovidMap from "./CovidMap";
-import PatientList from './PatientList';
-import DateSlider from './DateSlider';
+import CovidMap from "../../components/CovidMap";
+import PatientList from '../../components/PatientList';
+import DateSlider from '../../components/DateSlider';
 
 const CovidDashboard = (props) => {
     const [currentPatientIdx, setCurrentPatientIdx] = useState(null);
@@ -21,7 +21,7 @@ const CovidDashboard = (props) => {
     const diffFromNow = dateNow.diff(moment(dateStart, 'DD-MM-YYYY'), 'days');
 
     useEffect(() => {
-        fetch("https://cors-anywhere.herokuapp.com/https://maps.vnpost.vn/apps/covid19/api/patientapi/list")
+        fetch("https://maps.vnpost.vn/apps/covid19/api/patientapi/list")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -57,14 +57,14 @@ const CovidDashboard = (props) => {
             clearInterval(idInterval);
         }
         return () => clearInterval(idInterval);
-    }, [isStop]);
+    }, [isStop, diffFromNow]);
 
     const handlePatientsDateSelected = (days) => {
-        const selectedPatients = patients.filter(patient => {
+        const firstSelectedPatientIndex = patients.findIndex(patient => {
             const verifyDate = moment(patient.verifyDate);
             return verifyDate.isSameOrBefore(moment(dateStart, 'DD-MM-YYYY').add(days, 'days'));
         });
-        return selectedPatients;
+        return patients.slice(firstSelectedPatientIndex);
     };
 
     const patientMarkerClickedHandler = (patientIdx) => {
@@ -84,7 +84,7 @@ const CovidDashboard = (props) => {
 
     return (
         <Fragment>
-            <Row className="main-content">
+            <Row className="container__map-info-list">
                 <Col xs={9} style={{ height: "100%" }}><CovidMap onPatientMarkerClicked={patientMarkerClickedHandler} patients={currentPatients} selectedPatientIdx={currentPatientIdx} /></Col>
                 <Col xs={3} style={{ height: "100%" }}>
                     <Row className="patient-info">
