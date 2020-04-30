@@ -3,7 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import { get } from 'lodash';
 
 import { lineChart, variables } from '../../utils/variants';
-import { transformStatistics, transformStatisticsToLineChartData } from '../../utils';
+import { transformVietNamStatistics, transformWorldStatistics, transformStatisticsToLineChartData } from '../../utils';
 import './style.scss';
 import LineChart from '../../components/LineChart';
 import Spinner from '../../components/Spinner';
@@ -17,7 +17,8 @@ const StatsDashboard = () => {
 
   const [error, setError] = useState(null);
 
-  const lineNames = [lineChart.newPatients, lineChart.recoveredPatients, lineChart.recoveringPatiens, lineChart.totalPatients];
+  const lineNamesVN = [lineChart.newPatients, lineChart.recoveredPatients, lineChart.recoveringPatiens, lineChart.totalPatients];
+  const lineNamesWorld = [lineChart.totalPatients, lineChart.deadPatients, lineChart.recoveredPatients];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,13 +28,15 @@ const StatsDashboard = () => {
       try {
         const [vietnameData, worldData] = await Promise.all([promiseVietnamFetch, promiseWorldFetch]);
 
-        const transformVietnamData = transformStatistics(vietnameData);
-        const transformWorldData = transformStatistics(worldData);
+        const transformVietnamData = transformVietNamStatistics(vietnameData);
+        const transformWorldData = transformWorldStatistics(worldData);
+
+        console.log(worldData);
 
         setStatistics({
           isLoading: false,
-          vietnam: transformStatisticsToLineChartData(transformVietnamData, lineNames, 'spline'),
-          world: transformStatisticsToLineChartData(transformWorldData, lineNames, 'spline')
+          vietnam: transformStatisticsToLineChartData(transformVietnamData, lineNamesVN, 'spline'),
+          world: transformStatisticsToLineChartData(transformWorldData, lineNamesWorld, 'spline')
         });
       } catch (err) {
         setError(get(err, 'TypeError', 'Fail To Fetch'));
@@ -52,7 +55,7 @@ const StatsDashboard = () => {
           <Col xs={6}>
             <LineChart
               data={statistics.vietnam}
-              subtitle={lineChart.subtitle}
+              subtitle={lineChart.subtitleVN}
               title={lineChart.nations.Vietnam}
               axisXTitle={lineChart.time}
               axisYTitle={lineChart.numberOfPeople}
@@ -61,7 +64,7 @@ const StatsDashboard = () => {
           <Col xs={6}>
             <LineChart
               data={statistics.world}
-              subtitle={lineChart.subtitle}
+              subtitle={lineChart.subtitleWorld}
               title={lineChart.nations.world}
               axisXTitle={lineChart.time}
               axisYTitle={lineChart.numberOfPeople}

@@ -13,7 +13,7 @@ export const sum = (arr) => {
   return arr.reduce((total, el) => total + el, 0);
 };
 
-export const transformStatistics = (statisticObject) => {
+export const transformVietNamStatistics = (statisticObject) => {
   let oldNewPatientsData = 0;
   return Object.keys(statisticObject).map(key => {
     const totalPatients = statisticObject[key][0];
@@ -25,6 +25,12 @@ export const transformStatistics = (statisticObject) => {
       [key]: [newPatient, recoveredPatients, recoveringPatients, totalPatients]
     };
   });
+};
+
+export const transformWorldStatistics = (statisticObject) => {
+  return Object.keys(statisticObject).map(key => ({
+    [key]: [...get(statisticObject, key)]
+  }));
 };
 
 export const transformStatisticsToLineChartData = (data, lineNames, typeChart) => {
